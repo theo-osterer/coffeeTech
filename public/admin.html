@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoffeeTech - Gerenciamento de Produtos</title>
+    
+    <style>
+        /* Variáveis para cores de café */
+        :root {
+            --cafe-escuro: #5d4037;
+            --cafe-medio: #8d6e63;
+            --cafe-claro: #d7ccc8;
+            --fundo-claro: #f4f4f9;
+            --texto-escuro: #333;
+            --acao-verde: #4CAF50;
+            --acao-azul: #2196F3;
+            --acao-vermelho: #f44336;
+        }
+
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            background-color: var(--fundo-claro);
+            color: var(--texto-escuro);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
+        header {
+            background-color: var(--cafe-escuro);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        header h1 {
+            margin-bottom: 5px;
+        }
+
+        .hero, .crud-form, .products {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .hero {
+            text-align: center;
+        }
+
+        .hero h2 {
+            color: var(--cafe-medio);
+        }
+
+        /* --- Estilos do Formulário (CRUD FORM) --- */
+        .crud-form h2 {
+            color: var(--cafe-escuro);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: var(--cafe-escuro);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--cafe-claro);
+            border-radius: 4px;
+            box-sizing: border-box; 
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--cafe-medio);
+            outline: none;
+        }
+
+        #btn-salvar {
+            background-color: var(--acao-verde); 
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        #btn-salvar:hover {
+            background-color: #388e3c;
+        }
+
+        /* --- Estilos da Tabela (PRODUCTS) --- */
+        #produtos-tabela {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        #produtos-tabela thead th {
+            background-color: var(--cafe-medio);
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        #produtos-tabela tbody td {
+            padding: 10px;
+            border-bottom: 1px solid var(--cafe-claro);
+        }
+
+        #produtos-tabela tbody tr:nth-child(even) {
+            background-color: var(--fundo-claro);
+        }
+
+        /* Estilos dos Botões de Ação na Tabela */
+        .action-btn {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+            transition: opacity 0.3s;
+        }
+
+        .action-btn:hover {
+            opacity: 0.8;
+        }
+
+        .edit-btn {
+            background-color: var(--acao-azul); 
+        }
+
+        .delete-btn {
+            background-color: var(--acao-vermelho); 
+        }
+
+        /* Rodapé */
+        footer {
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 20px;
+            color: var(--cafe-medio);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>CoffeeTech ☕</h1>
+            <p>Gerenciamento de Produtos do Lançamento.</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h2>Gerenciamento de Produtos (CRUD)</h2>
+            <p>Cadastre, visualize, edite e exclua os itens do catálogo CoffeeTech.</p>
+        </section>
+
+        <section class="crud-form">
+            <h2>Cadastro / Edição de Produto</h2>
+            <form id="produto-form">
+                <input type="hidden" id="produto-id" value="">
+                
+                <div class="form-group">
+                    <label for="nome">Nome do Produto:</label>
+                    <input type="text" id="nome" name="nome" required>
+                </div>
+                <div class="form-group">
+                    <label for="descricao">Descrição Breve:</label>
+                    <input type="text" id="descricao" name="descricao" required>
+                </div>
+                <div class="form-group">
+                    <label for="preco">Preço (R$):</label>
+                    <input type="number" id="preco" name="preco" step="0.01" required>
+                </div>
+                <button type="submit" id="btn-salvar">Salvar Produto</button>
+            </form>
+        </section>
+
+        <hr>
+
+        <section class="products">
+            <h2>Catálogo de Produtos</h2>
+            <table id="produtos-tabela">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Descrição</th>
+                        <th>Preço</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 CoffeeTech. Todos os bugs reservados.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const produtoForm = document.getElementById('produto-form');
+            const produtosTabelaBody = document.querySelector('#produtos-tabela tbody');
+            const produtoIdInput = document.getElementById('produto-id');
+            const btnSalvar = document.getElementById('btn-salvar');
+
+            // --- RENDER (READ) ---
+            async function renderizarTabela() {
+                produtosTabelaBody.innerHTML = ''; // Limpa o conteúdo
+                try {
+                    const response = await fetch('/produtos'); // GET /produtos
+                    if (!response.ok) {
+                        throw new Error('Erro ao carregar produtos do servidor.');
+                    }
+                    const produtos = await response.json();
+
+                    produtos.forEach(produto => {
+                        const row = produtosTabelaBody.insertRow();
+                        
+                        // Garante que o preço seja formatado corretamente
+                        const precoFormatado = parseFloat(produto.preco).toFixed(2);
+                        
+                        row.insertCell().textContent = produto.id;
+                        row.insertCell().textContent = produto.nome;
+                        row.insertCell().textContent = produto.descricao;
+                        row.insertCell().textContent = `R$ ${precoFormatado}`;
+
+                        const acoesCell = row.insertCell();
+
+                        // Botão Editar
+                        const editBtn = document.createElement('button');
+                        editBtn.textContent = 'Editar ✏️';
+                        editBtn.classList.add('action-btn', 'edit-btn');
+                        // Chama a função global carregarParaEdicao
+                        editBtn.onclick = () => window.carregarParaEdicao(produto.id); 
+                        acoesCell.appendChild(editBtn);
+
+                        // Botão Excluir
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.textContent = 'Excluir 🗑️';
+                        editBtn.classList.add('action-btn', 'edit-btn');
+                        deleteBtn.classList.add('action-btn', 'delete-btn');
+                        // Chama a função global excluirProduto
+                        deleteBtn.onclick = () => window.excluirProduto(produto.id, produto.nome); 
+                        acoesCell.appendChild(deleteBtn);
+                    });
+                } catch (error) {
+                    console.error('Erro de rede ou servidor:', error);
+                    produtosTabelaBody.innerHTML = '<tr><td colspan="5">Erro ao carregar o catálogo. Verifique o servidor.</td></tr>';
+                }
+            }
+
+            // --- SALVAR (CREATE & UPDATE) ---
+            produtoForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const id = produtoIdInput.value;
+                const nome = document.getElementById('nome').value;
+                const descricao = document.getElementById('descricao').value;
+                const preco = parseFloat(document.getElementById('preco').value);
+
+                if (!nome || !descricao || isNaN(preco)) {
+                    alert('Por favor, preencha todos os campos corretamente.');
+                    return;
+                }
+
+                const dadosProduto = { nome, descricao, preco };
+                
+                let url = '/produtos';
+                let method = 'POST';
+
+                if (id) {
+                    // Se houver ID, é uma atualização (UPDATE)
+                    url = `/produtos/${id}`;
+                    method = 'PUT';
+                }
+
+                try {
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(dadosProduto),
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        alert(result.mensagem || `Produto ${nome} salvo com sucesso!`);
+                        produtoForm.reset();
+                        produtoIdInput.value = ''; // Limpa o ID oculto
+                        btnSalvar.textContent = 'Salvar Produto';
+                        renderizarTabela(); // Recarrega a tabela
+                    } else {
+                        alert(`Erro ao salvar: ${result.erro}`);
+                    }
+
+                } catch (error) {
+                    console.error('Erro ao comunicar com a API:', error);
+                    alert('Erro de conexão com o servidor.');
+                }
+            });
+            
+            // --- EDIÇÃO (LOAD FOR UPDATE) ---
+            async function carregarParaEdicao(id) {
+                try {
+                    const response = await fetch(`/produtos/${id}`); // GET /produtos/:id
+                    if (!response.ok) {
+                        throw new Error('Produto não encontrado.');
+                    }
+                    const produto = await response.json();
+
+                    // Preenche o formulário
+                    document.getElementById('nome').value = produto.nome;
+                    document.getElementById('descricao').value = produto.descricao;
+                    // O preço precisa ser convertido para float para o input type="number"
+                    document.getElementById('preco').value = parseFloat(produto.preco); 
+                    
+                    produtoIdInput.value = produto.id; // Define o ID para o modo de edição
+                    btnSalvar.textContent = `Atualizar ${produto.nome}`; // Altera o texto do botão
+
+                    // Rola para o formulário
+                    document.querySelector('.crud-form').scrollIntoView({ behavior: 'smooth' });
+
+                } catch (error) {
+                    console.error('Erro ao carregar produto para edição:', error);
+                    alert('Não foi possível carregar os dados do produto.');
+                }
+            }
+
+            // --- EXCLUIR (DELETE) ---
+            async function excluirProduto(id, nome) {
+                if (!confirm(`Tem certeza que deseja EXCLUIR o produto "${nome}"?`)) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/produtos/${id}`, {
+                        method: 'DELETE', // DELETE /produtos/:id
+                    });
+                    
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        alert(result.mensagem || 'Produto excluído com sucesso!');
+                        renderizarTabela(); // Recarrega a tabela
+                    } else {
+                        alert(`Erro ao excluir: ${result.erro}`);
+                    }
+
+                } catch (error) {
+                    console.error('Erro ao excluir:', error);
+                    alert('Erro de conexão com o servidor ao tentar excluir.');
+                }
+            }
+
+            // Torna as funções acessíveis globalmente para os botões da tabela (onclick)
+            window.carregarParaEdicao = carregarParaEdicao;
+            window.excluirProduto = excluirProduto;
+
+            // Carrega a tabela ao iniciar
+            renderizarTabela(); 
+        });
+    </script>
+</body>
+</html>
